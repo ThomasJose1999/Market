@@ -1,0 +1,9 @@
+user.email=thomasjose875@gmail.com
+user.name=Thomas Jose
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.url=https://github.com/ThomasJose1999/Market.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+user.name=ThomasJose1999
