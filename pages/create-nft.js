@@ -32,7 +32,7 @@ export default function CreateItem() {
       setFileUrl(url)
       console.log(url, " URL")
       
-    } catch (error) {<input
+    } catch (error) {<inputs
       type="file"
       name="Asset"
       className="my-4"
