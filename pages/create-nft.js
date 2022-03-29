@@ -28,23 +28,24 @@ export default function CreateItem() {
         }
       )
       const url = `https://ipfs.infura.io/ipfs/${added.path}`
-      console.log(url , " fileURL")
+      console.log(url, " fileURL")
       setFileUrl(url)
       console.log(url, " URL")
-      
-    } catch (error) {<inputs
-      type="file"
-      name="Asset"
-      className="my-4"
-      onChange={onChange}
-    />
+
+    } catch (error) {
+      <inputs
+        type="file"
+        name="Asset"
+        className="my-4"
+        onChange={onChange}
+      />
       console.log('Error uploading file: ', error)
-    }  
+    }
   }
   async function uploadToIPFS() {
     const { name, description, price } = formInput
-    console.log(fileUrl," fileurl")
-    if (!name || !description || !price || !fileUrl) return 
+    console.log(fileUrl, " fileurl")
+    if (!name || !description || !price || !fileUrl) return
     /* first, upload metadata to IPFS */
     const data = JSON.stringify({
       name, description, image: fileUrl
@@ -56,12 +57,12 @@ export default function CreateItem() {
       return url
     } catch (error) {
       console.log('Error uploading file: ', error)
-    }  
+    }
   }
 
   async function listNFTForSale() {
     const url = await uploadToIPFS()
-    console.log(url," hello");
+    console.log(url, " hello");
     const web3Modal = new Web3Modal()
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
@@ -70,12 +71,10 @@ export default function CreateItem() {
     /* create the NFT */
     const price = ethers.utils.parseUnits(formInput.price, 'ether')
     let contract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
-    let listingPrice = await contract.getListingPrice()
-    //console.log(listingPrice)
-    listingPrice = listingPrice.toString()
-    console.log(listingPrice, "listing")
-    console.log("++++++++++++++++++++++++++++++")
-    let transaction = await contract.createToken(url, price, { value: listingPrice })
+
+    console.log("hehe" + url)
+
+    let transaction = await contract.createToken(url, price)
     await transaction.wait()
 
     router.push('/')
@@ -84,7 +83,7 @@ export default function CreateItem() {
   return (
     <div className="flex justify-center">
       <div className="w-1/2 flex flex-col pb-12">
-        <input 
+        <input
           placeholder="Asset Name"
           className="mt-8 border rounded p-4"
           onChange={e => updateFormInput({ ...formInput, name: e.target.value })}

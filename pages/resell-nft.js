@@ -18,7 +18,7 @@ export default function ResellNFT() {
 
   useEffect(() => {
     fetchNFT()
-  }, [id])
+  })
 
   async function fetchNFT() {
     if (!tokenURI) return
@@ -35,10 +35,8 @@ export default function ResellNFT() {
 
     const priceFormatted = ethers.utils.parseUnits(formInput.price, 'ether')
     let contract = new ethers.Contract(marketplaceAddress, NFTMarketplace.abi, signer)
-    let listingPrice = await contract.getListingPrice()
 
-    listingPrice = listingPrice.toString()
-    let transaction = await contract.resellToken(id, priceFormatted, { value: listingPrice })
+    let transaction = await contract.resellToken(id, priceFormatted)
     await transaction.wait()
 
     router.push('/')
