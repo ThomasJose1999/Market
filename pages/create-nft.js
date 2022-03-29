@@ -4,6 +4,8 @@ import { create as ipfsHttpClient } from 'ipfs-http-client'
 import { useRouter } from 'next/router'
 import Web3Modal from 'web3modal'
 
+import { pinFileToIPFS, pinMetadataToIPFS } from '../scripts/uploadFile';
+
 const client = ipfsHttpClient('https://ipfs.infura.io:5001/api/v0')
 
 import {
@@ -21,47 +23,46 @@ export default function CreateItem() {
     /* upload image to IPFS */
     const file = e.target.files[0]
     try {
-      const added = await client.add(
-        file,
-        {
-          progress: (prog) => console.log(`received: ${prog}`)
-        }
-      )
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`
-      console.log(url , " fileURL")
+      const url = await pinFileToIPFS(file);
+
+      // const url = `https://ipfs.infura.io/ipfs/${added.path}`
+      console.log(url, " fileURL")
       setFileUrl(url)
       console.log(url, " URL")
-      
-    } catch (error) {<inputs
-      type="file"
-      name="Asset"
-      className="my-4"
-      onChange={onChange}
-    />
+
+    } catch (error) {
+      <inputs
+        type="file"
+        name="Asset"
+        className="my-4"
+        onChange={onChange}
+      />
       console.log('Error uploading file: ', error)
-    }  
+    }
   }
   async function uploadToIPFS() {
     const { name, description, price } = formInput
-    console.log(fileUrl," fileurl")
-    if (!name || !description || !price || !fileUrl) return 
+    console.log(fileUrl, " fileurl")
+    if (!name || !description || !price || !fileUrl) return
     /* first, upload metadata to IPFS */
-    const data = JSON.stringify({
-      name, description, image: fileUrl
-    })
+    const data = {
+      name: name,
+      description: description,
+      image: fileUrl
+    }
     try {
-      const added = await client.add(data)
-      const url = `https://ipfs.infura.io/ipfs/${added.path}`
+      const url = await pinMetadataToIPFS(data);
       /* after metadata is uploaded to IPFS, return the URL to use it in the transaction */
+      console.log(url)
       return url
     } catch (error) {
       console.log('Error uploading file: ', error)
-    }  
+    }
   }
 
   async function listNFTForSale() {
     const url = await uploadToIPFS()
-    console.log(url," hello");
+    console.log(url, " hello");
     const web3Modal = new Web3Modal()
     const connection = await web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection)
@@ -84,7 +85,7 @@ export default function CreateItem() {
   return (
     <div className="flex justify-center">
       <div className="w-1/2 flex flex-col pb-12">
-        <input 
+        <input
           placeholder="Asset Name"
           className="mt-8 border rounded p-4"
           onChange={e => updateFormInput({ ...formInput, name: e.target.value })}
