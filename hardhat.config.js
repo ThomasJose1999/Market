@@ -1,4 +1,5 @@
 /* hardhat.config.js */
+require('dotenv').config({ path: ".env.local" })
 require("@nomiclabs/hardhat-waffle")
 
 module.exports = {
@@ -7,11 +8,11 @@ module.exports = {
     hardhat: {
       chainId: 31337
     },
-//  unused configuration commented out for now
-//  mumbai: {
-//    url: "https://rpc-mumbai.maticvigil.com",
-//    accounts: [process.env.privateKey]
-//  }
+    rinkeby: {
+      url: process.env.rpc_url,
+      chainId: 4,
+      accounts: [process.env.pvt_key]
+    }
   },
   solidity: {
     version: "0.8.4",
