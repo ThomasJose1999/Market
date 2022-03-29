@@ -20,14 +20,14 @@ contract NFTMarketplace is ERC721URIStorage {
         uint256 tokenId;
         address payable owner;
         uint256 price;
-        bool sold;
+        bool listed;
     }
 
     event MarketItemCreated(
         uint256 indexed tokenId,
         address owner,
         uint256 price,
-        bool sold
+        bool listed
     );
 
     constructor() ERC721("Metaverse Tokens", "METT") {
@@ -74,7 +74,7 @@ contract NFTMarketplace is ERC721URIStorage {
             "Only item owner can perform this operation"
         );
 
-        idToMarketItem[tokenId].sold = false;
+        idToMarketItem[tokenId].listed = true;
         idToMarketItem[tokenId].price = price;
         idToMarketItem[tokenId].owner = payable(msg.sender);
         _itemsSold.decrement();
@@ -90,7 +90,7 @@ contract NFTMarketplace is ERC721URIStorage {
             "Please submit the asking price in order to complete the purchase"
         );
         idToMarketItem[tokenId].owner = payable(msg.sender);
-        idToMarketItem[tokenId].sold = true;
+        idToMarketItem[tokenId].listed = false;
         _itemsSold.increment();
 
         _transfer(seller, msg.sender, tokenId);
@@ -105,10 +105,7 @@ contract NFTMarketplace is ERC721URIStorage {
 
         MarketItem[] memory items = new MarketItem[](unsoldItemCount);
         for (uint i = 0; i < itemCount; i++) {
-            if (
-                idToMarketItem[i + 1].sold == false &&
-                idToMarketItem[i + 1].owner != msg.sender
-            ) {
+            if (idToMarketItem[i + 1].listed == true) {
                 uint currentId = i + 1;
                 MarketItem storage currentItem = idToMarketItem[currentId];
                 items[currentIndex] = currentItem;
@@ -125,7 +122,10 @@ contract NFTMarketplace is ERC721URIStorage {
         uint currentIndex = 0;
 
         for (uint i = 0; i < totalItemCount; i++) {
-            if (idToMarketItem[i + 1].owner == msg.sender) {
+            if (
+                idToMarketItem[i + 1].owner == msg.sender &&
+                idToMarketItem[i + 1].listed == false
+            ) {
                 itemCount += 1;
             }
         }
@@ -150,7 +150,7 @@ contract NFTMarketplace is ERC721URIStorage {
 
         for (uint i = 0; i < totalItemCount; i++) {
             if (
-                idToMarketItem[i + 1].sold == false &&
+                idToMarketItem[i + 1].listed == true &&
                 idToMarketItem[i + 1].owner == msg.sender
             ) {
                 itemCount += 1;
@@ -160,7 +160,7 @@ contract NFTMarketplace is ERC721URIStorage {
         MarketItem[] memory items = new MarketItem[](itemCount);
         for (uint i = 0; i < totalItemCount; i++) {
             if (
-                idToMarketItem[i + 1].sold == false &&
+                idToMarketItem[i + 1].listed == true &&
                 idToMarketItem[i + 1].owner == msg.sender
             ) {
                 uint currentId = i + 1;
